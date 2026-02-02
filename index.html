@@ -2,14 +2,19 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
+
+<!-- Título que aparece na aba do navegador -->
 <title>Clique Rápido PRO Ultimate</title>
+
+<!-- Deixa o site responsivo no celular -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<!-- GOOGLE ADSENSE -->
+<!-- ====== GOOGLE ADSENSE ====== -->
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8918456146021986"
-crossorigin="anonymous"></script>
+     crossorigin="anonymous"></script>
 
 <style>
+/* ====== ESTILO GERAL DA PÁGINA ====== */
 body {
     background: #121212;
     color: white;
@@ -18,9 +23,13 @@ body {
     margin: 0;
 }
 
+/* ====== TELAS (Start e Jogo) ====== */
 .tela {
     position: fixed;
-    inset: 0;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
     background: #121212;
     display: flex;
     justify-content: center;
@@ -28,6 +37,7 @@ body {
     flex-direction: column;
 }
 
+/* ====== CAMPO DE TEXTO ====== */
 input {
     padding: 10px;
     font-size: 18px;
@@ -37,6 +47,7 @@ input {
     text-align: center;
 }
 
+/* ====== BOTÕES ====== */
 button {
     padding: 15px 30px;
     font-size: 18px;
@@ -46,6 +57,7 @@ button {
     cursor: pointer;
 }
 
+/* ====== CAIXA DO JOGO ====== */
 .box {
     background: #1e1e1e;
     width: 320px;
@@ -54,6 +66,7 @@ button {
     border-radius: 15px;
 }
 
+/* ====== AVISO DE CONTAGEM ====== */
 #aviso {
     position: fixed;
     top: 40%;
@@ -65,6 +78,7 @@ button {
     z-index: 999;
 }
 
+/* ====== EMOJIS FLUTUANTES ====== */
 .emoji {
     position: fixed;
     bottom: -50px;
@@ -73,30 +87,30 @@ button {
     pointer-events: none;
 }
 
+/* ====== ANIMAÇÃO DOS EMOJIS ====== */
 @keyframes subir {
     from { transform: translateY(0); opacity: 1; }
     to { transform: translateY(-100vh); opacity: 0; }
-}
-
-.medalha {
-    margin-right: 5px;
 }
 </style>
 </head>
 
 <body>
 
-<!-- TELA START -->
+<!-- ====== TELA INICIAL ====== -->
 <div id="telaStart" class="tela">
     <h1>🎮 Clique Rápido PRO</h1>
     <input id="nomeJogador" placeholder="Digite seu nome" maxlength="12">
     <button id="btnStart">▶️ START</button>
 </div>
 
+<!-- Texto grande de contagem regressiva -->
 <div id="aviso"></div>
+
+<!-- Área onde os emojis animados aparecem -->
 <div id="emojis"></div>
 
-<!-- TELA JOGO -->
+<!-- ====== TELA DO JOGO ====== -->
 <div id="jogo" style="display:none;">
     <div class="box">
 
@@ -105,11 +119,16 @@ button {
         <p>Tempo: <span id="tempo">20</span>s</p>
         <p>Pontos: <span id="pontos">0</span></p>
 
+        <!-- Botão principal de clique -->
         <button onclick="clicar()">CLIQUE</button><br>
+
+        <!-- Botão que simula anúncio para ganhar tempo -->
         <button onclick="assistirAnuncio()">📺 +10s</button><br>
+
+        <!-- Botão para reiniciar o jogo -->
         <button onclick="novoJogo()">🎮 Novo Jogo</button>
 
-        <!-- BANNER ADSENSE -->
+        <!-- ====== BANNER ADSENSE ====== -->
         <div style="margin-top:15px">
             <ins class="adsbygoogle"
                 style="display:block"
@@ -119,7 +138,7 @@ button {
                 data-full-width-responsive="true"></ins>
         </div>
 
-        <!-- RANKING -->
+        <!-- Ranking dos melhores jogadores -->
         <div id="ranking">
             <h3>🏆 Ranking</h3>
             <ol id="listaRanking"></ol>
@@ -128,6 +147,7 @@ button {
 </div>
 
 <script>
+/* ====== VARIÁVEIS PRINCIPAIS ====== */
 let tempo = 20;
 let pontos = 0;
 let fase = 1;
@@ -136,21 +156,23 @@ let timer = null;
 let avisoTimer = null;
 let nome = "";
 
-/* STORAGE BLINDADO */
+/* ====== STORAGE BLINDADO ====== */
 let partidas = parseInt(localStorage.getItem("partidas")) || 0;
 let ranking = [];
 try {
     ranking = JSON.parse(localStorage.getItem("ranking")) || [];
-} catch {
+} catch (e) {
     ranking = [];
     localStorage.removeItem("ranking");
 }
 
+/* ====== EMOJIS ====== */
 const emojis = ["🎉","🔥","⭐","💎","🚀","😄"];
 
-/* START */
+/* ====== BOTÃO START ====== */
 document.getElementById("btnStart").addEventListener("click", startGame);
 
+/* ====== INICIA O JOGO ====== */
 function startGame() {
     nome = document.getElementById("nomeJogador").value || "Jogador";
     document.getElementById("jogador").innerText = nome;
@@ -163,19 +185,20 @@ function startGame() {
 
     try {
         (window.adsbygoogle = window.adsbygoogle || []).push({});
-    } catch {}
+    } catch (e) {}
 }
 
-/* CLIQUE */
+/* ====== FUNÇÃO DE CLIQUE ====== */
 function clicar() {
     if (!rodando) return;
 
     pontos++;
     document.getElementById("pontos").innerText = pontos;
+
     soltarEmoji();
 }
 
-/* CONTAGEM */
+/* ====== INICIA CONTAGEM ====== */
 function iniciar() {
     rodando = false;
     clearInterval(timer);
@@ -183,6 +206,7 @@ function iniciar() {
     mostrarAviso(5);
 }
 
+/* ====== MOSTRA 5,4,3,2,1, VAI ====== */
 function mostrarAviso(n) {
     const aviso = document.getElementById("aviso");
     aviso.style.display = "block";
@@ -204,6 +228,7 @@ function mostrarAviso(n) {
     }, 1000);
 }
 
+/* ====== COMEÇA A FASE ====== */
 function comecarJogo() {
     rodando = true;
     timer = setInterval(() => {
@@ -216,7 +241,7 @@ function comecarJogo() {
     }, 1000);
 }
 
-/* FASES */
+/* ====== PASSA DE FASE ====== */
 function proximaFase() {
     clearInterval(timer);
     fase++;
@@ -232,7 +257,7 @@ function proximaFase() {
     iniciar();
 }
 
-/* FIM */
+/* ====== FIM DE JOGO ====== */
 function fimDeJogo() {
     rodando = false;
     clearInterval(timer);
@@ -241,7 +266,7 @@ function fimDeJogo() {
     mostrarRanking();
 }
 
-/* ANÚNCIO BONUS */
+/* ====== SIMULA ANÚNCIO ====== */
 function assistirAnuncio() {
     if (!rodando) return;
     alert("Simulando anúncio\n+10 segundos!");
@@ -249,18 +274,23 @@ function assistirAnuncio() {
     document.getElementById("tempo").innerText = tempo;
 }
 
-/* RANKING + MEDALHAS */
+/* ====== SALVA NO RANKING ====== */
 function salvarRanking() {
     partidas++;
     localStorage.setItem("partidas", partidas);
 
-    ranking.push({ jogador: nome, pontos: pontos });
+    ranking.push({
+        jogador: nome,
+        pontos: pontos
+    });
+
     ranking.sort((a, b) => b.pontos - a.pontos);
     ranking = ranking.slice(0, 5);
 
     localStorage.setItem("ranking", JSON.stringify(ranking));
 }
 
+/* ====== MOSTRA RANKING ====== */
 function mostrarRanking() {
     const lista = document.getElementById("listaRanking");
     lista.innerHTML = "";
@@ -273,12 +303,12 @@ function mostrarRanking() {
         else if (i === 1) medalha = "🥈";
         else if (i === 2) medalha = "🥉";
 
-        li.innerHTML = `<span class="medalha">${medalha}</span>${r.jogador} — ${r.pontos} pts`;
+        li.innerHTML = `${medalha} ${r.jogador} — ${r.pontos} pts`;
         lista.appendChild(li);
     });
 }
 
-/* REINICIAR */
+/* ====== REINICIA ====== */
 function novoJogo() {
     clearInterval(timer);
     clearInterval(avisoTimer);
@@ -294,7 +324,7 @@ function novoJogo() {
     iniciar();
 }
 
-/* EMOJIS */
+/* ====== EMOJIS ====== */
 function soltarEmoji() {
     const e = document.createElement("div");
     e.className = "emoji";
@@ -303,7 +333,9 @@ function soltarEmoji() {
 
     document.getElementById("emojis").appendChild(e);
 
-    setTimeout(() => e.remove(), 3000);
+    setTimeout(() => {
+        e.remove();
+    }, 3000);
 }
 </script>
 
