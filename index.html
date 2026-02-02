@@ -114,4 +114,215 @@ button {
         <p>Pontos: <span id="pontos">0</span></p>
 
         <button onclick="clicar()">CLIQUE</button><br>
-        <button onclick="assistirAnuncio()">📺
+        <button onclick="assistirAnuncio()">📺 +10s</button><br>
+        <button onclick="novoJogo()">🎮 Novo Jogo</button>
+
+        <!-- ====== BANNER DE ANÚNCIO ====== -->
+        <div id="adBox">
+            <ins class="adsbygoogle"
+                style="display:block"
+                data-ad-client="ca-pub-8918456146021986"
+                data-ad-slot="1234567890"
+                data-ad-format="auto"
+                data-full-width-responsive="true"></ins>
+        </div>
+
+        <div id="ranking">
+            <h3>🏆 Ranking</h3>
+            <ol id="listaRanking"></ol>
+        </div>
+    </div>
+</div>
+
+<!-- ====== SONS ====== -->
+<audio id="somClique" src="https://www.soundjay.com/button/sounds/button-16.mp3"></audio>
+<audio id="musica" loop src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"></audio>
+
+<script>
+/* ====== VARIÁVEIS ====== */
+let tempo = 20;
+let pontos = 0;
+let fase = 1;
+let rodando = false;
+let timer = null;
+let avisoTimer = null;
+let nome = "";
+
+/* ====== LOCALSTORAGE SEGURO ====== */
+let partidas = parseInt(localStorage.getItem("partidas")) || 0;
+let ranking = [];
+try {
+    ranking = JSON.parse(localStorage.getItem("ranking")) || [];
+} catch {
+    ranking = [];
+    localStorage.removeItem("ranking");
+}
+
+/* ====== EMOJIS ====== */
+const emojis = ["🎉","🔥","⭐","💎","🚀","😄"];
+
+/* ====== ADS SAFE INIT ====== */
+document.addEventListener("DOMContentLoaded", () => {
+    try {
+        (window.adsbygoogle = window.adsbygoogle || []).push({});
+    } catch (e) {
+        console.log("AdSense ainda não carregou");
+    }
+});
+
+/* ====== START ====== */
+document.getElementById("btnStart").addEventListener("click", startGame);
+
+function startGame() {
+    nome = document.getElementById("nomeJogador").value || "Jogador";
+    document.getElementById("jogador").innerText = nome;
+
+    document.getElementById("telaStart").style.display = "none";
+    document.getElementById("jogo").style.display = "block";
+
+    mostrarRanking();
+    iniciar();
+}
+
+/* ====== CLIQUE ====== */
+function clicar() {
+    if (!rodando) return;
+
+    pontos++;
+    document.getElementById("pontos").innerText = pontos;
+    document.getElementById("somClique").play();
+
+    const musica = document.getElementById("musica");
+    if (musica.paused) {
+        musica.volume = 0.3;
+        musica.play();
+    }
+
+    soltarEmoji();
+}
+
+/* ====== INICIAR ====== */
+function iniciar() {
+    rodando = false;
+    clearInterval(timer);
+    clearInterval(avisoTimer);
+    mostrarAviso(5);
+}
+
+/* ====== CONTAGEM ====== */
+function mostrarAviso(n) {
+    const aviso = document.getElementById("aviso");
+    aviso.style.display = "block";
+    aviso.innerText = n;
+
+    let c = n;
+    avisoTimer = setInterval(() => {
+        c--;
+        if (c > 0) {
+            aviso.innerText = c;
+        } else {
+            clearInterval(avisoTimer);
+            aviso.innerText = "VAI!";
+            setTimeout(() => {
+                aviso.style.display = "none";
+                comecarJogo();
+            }, 500);
+        }
+    }, 1000);
+}
+
+/* ====== JOGO ====== */
+function comecarJogo() {
+    rodando = true;
+    timer = setInterval(() => {
+        tempo--;
+        document.getElementById("tempo").innerText = tempo;
+
+        if (tempo <= 0) {
+            proximaFase();
+        }
+    }, 1000);
+}
+
+/* ====== FASE ====== */
+function proximaFase() {
+    clearInterval(timer);
+    fase++;
+    document.getElementById("fase").innerText = fase;
+
+    if (fase > 5) {
+        fimDeJogo();
+        return;
+    }
+
+    tempo = Math.max(5, 20 - fase * 2);
+    document.getElementById("tempo").innerText = tempo;
+    iniciar();
+}
+
+/* ====== FIM ====== */
+function fimDeJogo() {
+    rodando = false;
+    clearInterval(timer);
+
+    const musica = document.getElementById("musica");
+    musica.pause();
+    musica.currentTime = 0;
+
+    salvarRanking();
+    mostrarRanking();
+}
+
+/* ====== ANÚNCIO FAKE ====== */
+function assistirAnuncio() {
+    if (!rodando) return;
+    tempo += 10;
+    document.getElementById("tempo").innerText = tempo;
+}
+
+/* ====== RANKING COM MEDALHAS ====== */
+function salvarRanking() {
+    partidas++;
+    localStorage.setItem("partidas", partidas);
+
+    ranking.push({
+        jogador: nome,
+        pontos: pontos
+    });
+
+    ranking.sort((a, b) => b.pontos - a.pontos);
+    ranking = ranking.slice(0, 5);
+
+    localStorage.setItem("ranking", JSON.stringify(ranking));
+}
+
+function mostrarRanking() {
+    const lista = document.getElementById("listaRanking");
+    lista.innerHTML = "";
+
+    const medalhas = ["🥇", "🥈", "🥉", "🏅", "🏅"];
+
+    ranking.forEach((r, i) => {
+        const li = document.createElement("li");
+        li.textContent = `${medalhas[i] || "🏅"} ${r.jogador} — ${r.pontos} pts`;
+        lista.appendChild(li);
+    });
+}
+
+/* ====== EMOJI ====== */
+function soltarEmoji() {
+    const e = document.createElement("div");
+    e.className = "emoji";
+    e.innerText = emojis[Math.floor(Math.random() * emojis.length)];
+    e.style.left = Math.random() * 90 + "vw";
+
+    document.getElementById("emojis").appendChild(e);
+
+    setTimeout(() => {
+        e.remove();
+    }, 3000);
+}
+</script>
+
+</body>
+</html>
